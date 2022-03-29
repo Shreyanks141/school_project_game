@@ -84,7 +84,8 @@ def gameplay():
       print("Bad Luck, You Lost!")
       break
     tem = 'Rock Paper Scizzors'
-    my.execute(f'insert into history values({zzz},{tem});')
+    my.execute(f'insert into his values("{zzz}","{tem}");')
+    my.execute("commit")
 
 #Game 2.
 def gameplay2():
@@ -121,13 +122,15 @@ def gameplay2():
           i = i +1
     print("The number that u have choosed is : ",num)
     tem = 'Guess the number'
-    my.execute(f'insert into history values({zzz},{tem});')
+    my.execute(f'insert into his values("{zzz}","{tem}");')
+    my.execute("commit")
 
 #Game 3.
 def game():
     global zzz
     tem = 'Tic-Tac-Toe'
-    my.execute(f"insert into history values({zzz},{tem});")
+    my.execute(f'insert into his values("{zzz}","{tem}");')
+    my.execute("commit")
     theBoard = {'7': ' ' , '8': ' ' , '9': ' ' ,
                 '4': ' ' , '5': ' ' , '6': ' ' ,
                 '1': ' ' , '2': ' ' , '3': ' ' }
@@ -204,7 +207,8 @@ def game():
 def game4():
     global zzz
     tem = 'Connect four'
-    my.execute(f'insert into history values({zzz},{tem});')
+    my.execute(f'insert into his values("{zzz}","{tem}");')
+    my.execute("commit")
     import numpy as np
     row_count=int(input("Enter the number of rows of the board , (>5 is preffered) :"))
     col_count=int(input("Enter the number of columns of the board, (>5 is preffered) :"))
@@ -287,7 +291,8 @@ def game4():
 my.execute("create database if not exists test;")
 my.execute("use test;")
 my.execute("create table if not exists cross_check(id varchar(25) primary key,psw varchar(25));")
-my.execute("create table if not exists history(id varchar(25),games_played varchar(25));")
+my.execute("drop table his;")
+my.execute("create table if not exists his(id varchar(50),games_played varchar(25));")
 #Brains:
 zzz = ""
 ddd = 0
@@ -299,12 +304,12 @@ def login_in():
     while (d == 0):
         print("To login in please enter your user id and psw:")
         inp111 = input("Enter user id:")
-        inp222 = input("Enter the psw you want to set:")
+        inp222 = input("Enter the psw:")
         my.execute("select * from cross_check group by id;")
         data1 = my.fetchall()
         for i in data1:
             if (i[0] == inp111) and (i[1] == inp222):
-                zzz = i
+                zzz = i[0]
                 print("Login in succesfull:")
                 print()
                 d = 1
@@ -317,7 +322,7 @@ def login_in():
         my.execute("commit")
     
 def sign_up():
-    global pp,d,zzz,ddd
+    global pp,d,zzz,ddd,ppp,dd
     while (ddd == 0):
         print("To sign in please enter a user id and psw:")
         inp111 = input("Enter user id:")
@@ -417,9 +422,8 @@ if dd == 1:
             las = 1
             print("THANKS FOR PLAYING :)")
             print("History of games played are:")
-            my.execute("select * from history where id == zzz;")
+            print(zzz)
+            my.execute(f'select * from his where id = "{zzz}";')
             data = my.fetchall()
-            for i in data:
-                print(data)
             my.close()
             mycon.close()
