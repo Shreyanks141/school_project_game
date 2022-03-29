@@ -1,5 +1,5 @@
 import mysql.connector as sql
-mycon = sql.connect(host= "localhost",user="root",passwd="")
+mycon = sql.connect(host= "localhost",user="root",passwd="Shreyank12")
 my = mycon.cursor()
 
 #Game 1.
@@ -66,6 +66,7 @@ def update_scores(predicted, player_input):
       print("\nYou played SCISSORS, computer played SCISSORS.")
       print("\nComputer Score:",computer_score, "\nPlayer score:", player_score)
 def gameplay():
+  global zzz
   valid_entries = ['0', '1', "2"]
   while True:
     predicted = prediction()
@@ -82,12 +83,12 @@ def gameplay():
     elif computer_score == 5:
       print("Bad Luck, You Lost!")
       break
-    ins = "insert into history values(%s,%s)"
-    val = (zzz,"Rock,Paper,Scisssor")
-    my.execute(ins,val)
+    tem = 'Rock Paper Scizzors'
+    my.execute(f'insert into history values({zzz},{tem});')
 
 #Game 2.
 def gameplay2():
+    global zzz
     cards = [[],[],[],[],[],[]]
     power_of_2 = [1,2,4,8,16,32]
     for num in range(1,64):
@@ -119,15 +120,14 @@ def gameplay2():
         elif desision == "no":
           i = i +1
     print("The number that u have choosed is : ",num)
-    ins = "insert into history values(%s,%s)"
-    val = (zzz,"Guess the number")
-    my.execute(ins,val)
+    tem = 'Guess the number'
+    my.execute(f'insert into history values({zzz},{tem});')
 
 #Game 3.
 def game():
-    ins = "insert into history values(%s,%s)"
-    val = (zzz,"Tic-Tac-Toe")
-    my.execute(ins,val)
+    global zzz
+    tem = 'Tic-Tac-Toe'
+    my.execute(f"insert into history values({zzz},{tem});")
     theBoard = {'7': ' ' , '8': ' ' , '9': ' ' ,
                 '4': ' ' , '5': ' ' , '6': ' ' ,
                 '1': ' ' , '2': ' ' , '3': ' ' }
@@ -202,9 +202,9 @@ def game():
             turn = 'X'
 #Game 4.
 def game4():
-    ins = "insert into history values(%s,%s)"
-    val = (zzz,"Connect four")
-    my.execute(ins,val)
+    global zzz
+    tem = 'Connect four'
+    my.execute(f'insert into history values({zzz},{tem});')
     import numpy as np
     row_count=int(input("Enter the number of rows of the board , (>5 is preffered) :"))
     col_count=int(input("Enter the number of columns of the board, (>5 is preffered) :"))
@@ -281,12 +281,13 @@ def game4():
               game_over=True
       turn+=1
       turn=turn%2
-      
+
+
 #system setup:
 my.execute("create database if not exists test;")
 my.execute("use test;")
 my.execute("create table if not exists cross_check(id varchar(25) primary key,psw varchar(25));")
-my.execute("create table if not exists history(id varchar(25) primary key,games_played varchar(25));")
+my.execute("create table if not exists history(id varchar(25),games_played varchar(25));")
 #Brains:
 zzz = ""
 ddd = 0
@@ -299,17 +300,15 @@ def login_in():
         print("To login in please enter your user id and psw:")
         inp111 = input("Enter user id:")
         inp222 = input("Enter the psw you want to set:")
-        my.execute("select * from cross_check;")
+        my.execute("select * from cross_check group by id;")
         data1 = my.fetchall()
-        data1 = list(data1)
         for i in data1:
             if (i[0] == inp111) and (i[1] == inp222):
                 zzz = i
                 print("Login in succesfull:")
                 print()
-                break
-        if (zzz != ""):
-            break
+                d = 1
+        if (zzz == ""):
             print("User ID not found or psw entered is wrong pls")
             ttt = input("Would you like to try again:type 1:,if you want to sign in:type2:")
             if (ttt == 2):
@@ -317,7 +316,7 @@ def login_in():
                 pp = 1
         my.execute("commit")
     
-def sign_in():
+def sign_up():
     global pp,d,zzz,ddd
     while (ddd == 0):
         print("To sign in please enter a user id and psw:")
@@ -327,94 +326,100 @@ def sign_in():
         if inp222 == inp2222:
             my.execute("select * from cross_check group by id;")
             data1 = my.fetchall()
-            data1 = list(data1)
-            if inp111 in data1:
-                print("User id already exist,Pls continue to login page:")
-                ppp = 1
-                ddd = 1
-            elif inp111 not in data1:
-                ins = "insert into cross_check values(%s,%s)"
-                val = (inp111,inp222)
-                my.execute(ins,val)
-                zzz = inp111
-                ddd = 1
-                ppp = 1
-                print("Sign in succesfull:")
-                print()
+            for i in data1:
+                for j in i:
+                    if inp111 == j:
+                        print("User id already exist")
+                        ppp = 1
+                        ddd = 1
+            if ppp == 0:
+                        ins = "insert into cross_check values(%s,%s)"
+                        val = (inp111,inp222)
+                        my.execute(ins,val)
+                        zzz = inp111
+                        ddd = 1
+                        ppp = 1
+                        dd = 1
+                        print("Sign in succesfull:")
+                        print()
         elif (ddd == 1):
                 break
         else:
             print("Both psw entered are not the same,pld try again:")
         my.execute("commit")
+    
 dd = 0
 while (dd == 0):
-   print("Welcome to the game bar,but first you need to sign in/login in")
-   print("type 1:for sign in,type 2:for login in")
+   print()
+   print("Welcome to the game bar,but first you need to sign up/login in")
+   print("type 1:for sign up,type 2:for login in")
    inppp = input("Enter your choice:")
    if (inppp == "1"):
-       sign_in()
-       if (ppp == 0):
-           dd = 1
+       if ppp == 1:
+           print("user exists pls login_in")
+       sign_up()
    elif (inppp == "2"):
        login_in()
        if (pp == 0):
            dd = 1
 #Actual Work:
-print("Welcome to the game bar,Here you will find different games you can play:")
-print()
-print("The games includes\n1)Rock,Paper,Scisssor\n2)Guess the number\n3)Tic-Tac-Toe\n4)Connect Four")
-print()
-print("The detailed discribtion will be given of how to play a game with you choose it:")
-print()
-di = {1:"Rock,Paper,Scisssor",2:"Guess the number",3:"Tic-Tac-Toe",4:"Connect Four"}
-print(di)
-inp1  = int(input("Enter the number for which game you want to play of:"))
-print(("-")*40)
-las = 0
-while (las == 0):
-    if (inp1 == 1):
-        print("You are playing Rock,Paper,Scisssor with the AI")
-        print("The wining point/score is 5")
-        print("You just need to give input as 0,1,2 which are representing Rock,Paper,Scisssor")
-        print("!!!!Best of Luck!!!!")
-        gameplay()
-    elif (inp1 == 2):
-        print("You are playing Guess the number with the AI")
-        print("!!!!Best of Luck!!!!")
-        gameplay2()
-    elif (inp1 == 3):
-        print("You are playing Tic-Tac-Toe")
-        print("You need two players for this game")
-        print("The instructions are simple,like how the keypad of phone is of \n7,8,9\n4,5,6\n1,2,3")
-        print("The input of either X or O will be inputed using the numbers from 1 - 9")
-        print("The number you enter is the place of your X or O")
-        print("!!!!Best of Luck!!!!")
-        game()
-    elif (inp1 == 4):
-        print("You are playing Connect Four:")
-        print("You can only decide the shape of the board:")
-        Print("This game is between Two players:")
-        print("!!!!Best of Luck!!!!")
-    inp2  = input("Do you want to play a game again ,pls enter yes or no:")
-    inp2 = inp2.lower()
-    if (inp2 == "yes"):
-        print(("-")*40)
-        print("Welcome to the game bar,Here you will find different games you can play:")
-        print()
-        print("The games includes \n1)Rock,Paper,Scisssor\n2)Guess the number\n3)Tic-Tac-Toe\ 4)Connect Four")
-        print()
-        print("The detailed discribtion will be given of how to play a game with you choose it:")
-        print()
-        di = {1:"Rock,Paper,Scisssor",2:"Guess the number",3:"Tic-Tac-Toe",4:"Connect Four"}
-        print(di)
-        inp1  = int(input("Enter the number for which game you want to play of:"))
-    elif (inp2 == "no"):
-        las = 1
-        print("THANKS FOR PLAYING :)")
-        print("History of games played are:")
-        my.execute("select * from history where id == zzz;")
-        data = my.fetchall()
-        for i in data:
-            print(data)
-        my.close()
-        mycon.close()
+if dd == 1:
+    print("Welcome to the game bar,Here you will find different games you can play:")
+    print()
+    print("The games includes\n1)Rock,Paper,Scisssor\n2)Guess the number\n3)Tic-Tac-Toe\n4)Connect Four")
+    print()
+    print("The detailed discribtion will be given of how to play a game with you choose it:")
+    print()
+    di = {1:"Rock,Paper,Scisssor",2:"Guess the number",3:"Tic-Tac-Toe",4:"Connect Four"}
+    print(di)
+    inp1  = int(input("Enter the number for which game you want to play of:"))
+    print(("-")*40)
+    las = 0
+    while (las == 0):
+        if (inp1 == 1):
+            print("You are playing Rock,Paper,Scisssor with the AI")
+            print("The wining point/score is 5")
+            print("You just need to give input as 0,1,2 which are representing Rock,Paper,Scisssor")
+            print("!!!!Best of Luck!!!!")
+            gameplay()
+        elif (inp1 == 2):
+            print("You are playing Guess the number with the AI")
+            print("!!!!Best of Luck!!!!")
+            gameplay2()
+        elif (inp1 == 3):
+            print("You are playing Tic-Tac-Toe")
+            print("You need two players for this game")
+            print("The instructions are simple,like how the keypad of phone is of \n7,8,9\n4,5,6\n1,2,3")
+            print("The input of either X or O will be inputed using the numbers from 1 - 9")
+            print("The number you enter is the place of your X or O")
+            print("!!!!Best of Luck!!!!")
+            game()
+        elif (inp1 == 4):
+            print("You are playing Connect Four:")
+            print("You can only decide the shape of the board:")
+            print("This game is between Two players:")
+            print("!!!!Best of Luck!!!!")
+            game4()
+        inp2  = input("Do you want to play a game again ,pls enter yes or no:")
+        inp2 = inp2.lower()
+        if (inp2 == "yes"):
+            print(("-")*40)
+            print("Welcome to the game bar,Here you will find different games you can play:")
+            print()
+            print("The games includes \n1)Rock,Paper,Scisssor\n2)Guess the number\n3)Tic-Tac-Toe\ 4)Connect Four")
+            print()
+            print("The detailed discribtion will be given of how to play a game with you choose it:")
+            print()
+            di = {1:"Rock,Paper,Scisssor",2:"Guess the number",3:"Tic-Tac-Toe",4:"Connect Four"}
+            print(di)
+            inp1  = int(input("Enter the number for which game you want to play of:"))
+        elif (inp2 == "no"):
+            las = 1
+            print("THANKS FOR PLAYING :)")
+            print("History of games played are:")
+            my.execute("select * from history where id == zzz;")
+            data = my.fetchall()
+            for i in data:
+                print(data)
+            my.close()
+            mycon.close()
